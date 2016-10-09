@@ -17,10 +17,8 @@
 // 
 // @params: el : Node : the Canvas Node
 // @params: numSections : Number : the number of sections to split the canvas into
-var SectionedCanvas = function(el, numSections) {
-  this.el = el;
-  this.parentNode = el.parentNode;
-  this.ctx = el.getContext('2d');
+var SectionedCanvas = function(id, numSections) {
+  this.id = id;
   
   if (numSections <= 0) numSections = 2;
   this.numSections = numSections || 2;
@@ -33,6 +31,7 @@ var SectionedCanvas = function(el, numSections) {
   this.images = {};
   
   this.initialize();
+  window.addEventListener('resize', this.initialize.bind(this));
 }
 
 // `initialize()`
@@ -47,13 +46,12 @@ var SectionedCanvas = function(el, numSections) {
 // @returns: none
 SectionedCanvas.prototype.initialize = function() {
   // Register an event listener to resize during window resize
-  window.addEventListener('resize', function() {
-    this.resizeToParent();
-    this.clearAll();
-    this.drawStack();
-  }.bind(this), false);
-  // Draw canvas border for the first time.
-  this.resizeToParent();
+  this.el = document.querySelector(this.id);
+  const p = this.parentNode = this.el.parentNode;
+  this.ctx = this.el.getContext('2d');
+  
+  // resize, clear, then redraw
+  this.resizeToParent(p.clientWidth, p.clientHeight);
   this.clearAll();
   this.drawStack();
 }
@@ -65,16 +63,16 @@ SectionedCanvas.prototype.initialize = function() {
 // @post: the canvas will be resized to math the parent node's clientWidth and
 // Height, respectively
 // 
-// @params: none
+// @params: width : Number : new width
+// @params: height : Number : new height
 // @returns: none
-SectionedCanvas.prototype.resizeToParent = function() {
-  var p = this.parentNode;
+SectionedCanvas.prototype.resizeToParent = function(width, height) {
   // resize canvas
-  this.el.width = p.clientWidth;
-  this.el.height = p.clientHeight;
+  this.el.width = width;
+  this.el.height = height;
   
   // update sectionWidth
-  this.sectionWidth = Math.floor(p.clientWidth / this.numSections);
+  this.sectionWidth = Math.floor(width / this.numSections);
 }
 
 // `clear(section)`
@@ -153,6 +151,16 @@ SectionedCanvas.prototype.drawImages = function(images) {
   this.images = (!!images) ? images : this.images;
   this.clearAll();
   this.drawStack();
+}
+
+SectionedCanvas.prototype.setClickHandler = function(fun) {
+  var el = document.querySelector(this.id);
+  var clicked = false;
+  el.addEventListener('mousedown', function() { clicked = true;}, false);
+  el.addEventListener('mouseup', function() { clicked = false;}, false);
+  el.addEventListener('mousemove', function(e) {
+    if (clicked) fun(e);
+  }, false);
 }
 
 SectionedCanvas.prototype.drawSpanningLine = function(id, o, d) {

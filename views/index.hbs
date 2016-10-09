@@ -17,13 +17,13 @@
   <li v-on:click="$emit('select')">
     <div class="coord-input" v-bind:class="{ 'selected': active }">
       <div class="coord">
-        <input type="number" v-model="pair.origin.x" @:click="$emit('selectCoord', 0); console.log('click')"/>,
-        <input type="number" v-model="pair.origin.y" v-on:click="$emit('selectCoord', 1)"/>
+        <input type="number" v-model="pair.origin.x" v-on:click.stop="$emit('coord', 0)"/>,
+        <input type="number" v-model="pair.origin.y" v-on:click.stop="$emit('coord', 1)"/>
       </div>
       <span>⇒</span>
       <div class="coord">
-        <input type="number" v-model="pair.dest.x" v-on:click="$emit('selectCoord', 2)"/>,
-        <input type="number" v-model="pair.dest.y" v-on:click="$emit('selectCoord', 3)"/>
+        <input type="number" v-model="pair.dest.x" v-on:click.stop="$emit('coord', 2)"/>,
+        <input type="number" v-model="pair.dest.y" v-on:click.stop="$emit('coord', 3)"/>
       </div>
     </div>
     <div class="coord-delete" v-on:click="$emit('remove')">+</div>
@@ -39,7 +39,7 @@
         :pair="coordMap"
         :active="(curCoordId === coordMap.id)"
         v-on:select="selectCoordMap(coordMap.id)"
-        v-on:selectCoord="selCoord()"
+        v-on:coord="selCoord"
         v-on:remove="rmvCoordMap(coordMap.id)"
         :key="'coordMap-' + index"></coord-map>
     </ol>
@@ -51,7 +51,7 @@
 <div id="app-container">
   <div class="app">
     <div class="header">
-        <h1 class="app-title">Pictorial Angularizer mk.3000</h1>
+        <h1 class="app-title">Pictorial Angularizer mk-3000</h1>
     </div>
     <div class="body">
         <div class="sidebar">
@@ -69,7 +69,7 @@
             </div>
         </div>
         <div class="panels">
-            <canvas></canvas>
+            <canvas id="cv"></canvas>
         </div>
     </div>
   </div>

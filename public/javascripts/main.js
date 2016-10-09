@@ -87,6 +87,7 @@
           
           // select new one
           this.selectCoordMap(id);
+          this.selCoord(0);
         },
         
         rmvCoordMap: function(coordId) {
@@ -114,10 +115,31 @@
           }
           // console.log("selected", this.curCoordMap);
         },
-        
-        selCoord: function(e) {
-          console.log("e", e);
+        selCoord: function(coord) {
+          this.curCoord =  coord;
         }
+      },
+      mounted: function() {
+        console.log("mounted point list");
+        c.setClickHandler(function(e) {
+          console.log("evt", e);
+          console.log("this", this.curCoordMap);
+          var x = e.layerX;
+          var y = e.layerY;
+          var curCoordMap = this.curCoordMap;
+          switch (this.curCoord) {
+            case 0:
+            case 1:
+              curCoordMap['origin'].x = x;
+              curCoordMap['origin'].y = y;
+              break;
+            case 2:
+            case 3:
+              curCoordMap['dest'].x = x;
+              curCoordMap['dest'].y = y;
+              break;
+          }
+        }.bind(this));
       },
       updated: function() {
         // update boards
@@ -131,9 +153,12 @@
       data: function() {
         return {}
       },
+      created: function() {
+        c = new SectionedCanvas('#cv', 2);
+      },
       mounted: function() {
-        // Obtain a reference to the canvas element using its id.
-        c = new SectionedCanvas(this.$el.querySelector('canvas'), 2);
+        // gotta refersh the thing now that we're in the DOM
+        c.initialize();
       }
     });
 })();

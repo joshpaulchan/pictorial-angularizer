@@ -15,28 +15,91 @@
           hasFile: false,
           filename: '',
           files: null,
-          reader: reader
+          reader: reader,
+          refreshHandler: null
         }
       },
       methods : {
-        previewFile: function(e) {
-          this.files = e.target.files || e.dataTransfer.files
-          this.filename = this.files[0].name;
-          console.log("filename", this.files[0].name);
-          this.hasFile = true;
+        uploadFile: function(e) {
+          e.preventDefault();
+          if (this.refreshHandler) {
+            clearTimeout(this.refreshHandler);
+          }
           
-          // create a file reader to conver file
+          var mountImages = this.mountImages;
           
-          this.reader.onload = (e) => {
+          // send file data using AJAX
+          function sendFileWhenDone(fileData) {
+            // you can access the file data from the file reader's event object as:
+            
+            console.log("File data we sent: ", fileData);
+            
+            // Send AJAX request with form data
+            $.ajax({
+              type: "POST",
+              // specify the url we want to upload our file to
+              url: '/uploadFile',
+              // this is how we pass in the actual file data from the form
+              data: fileData,
+              processData: false,
+              contentType: false,
+              success: function(JSONsentFromServer) {
+                // what do you do went it goes through
+                if (JSONsentFromServer.success) {
+                  console.log("[Message]", JSONsentFromServer.message);
+                  mountImages(JSONsentFromServer.message);
+                }
+              },
+              error: function(errorSentFromServer) {
+                // what to do if error
+                console.log("[Error]", errorSentFromServer);
+              }
+            })
+              
+          }
+          
+          this.files = e.target.files || e.dataTransfer.files;
+          var file = this.files[0];
+          
+          // create the container for our file data
+          var fd = new FormData();
+          
+          // encode the file
+          fd.append('seed', file);
+          
+          sendFileWhenDone(fd);
+        },
+        mountImages: function(url) {
+          
+          var insertImage = function(baseUrlOrData, section) {
             // create a new image object
             var img = new Image;
             
             // draw it on the canvas
-            img.onload = function() { c.drawImage(0, img); };
-            img.src = e.target.result;
+            img.onload = function() {
+              c.drawImage(section, img);
+            };
+            
+            if (section === 0) {
+              img.src = baseUrlOrData;
+            }
+            else {
+              img.src = baseUrlOrData + '?t=' + new Date().getTime();
+            }
+          } 
+          
+          // create a file reader to conver file
+          this.reader.onload = (e) => {
+            insertImage(e.target.result, 0);
           };
+          
+          // Display the first image
           this.reader.readAsDataURL(this.files[0]);
           
+          // Display second
+          this.refreshHandler = window.setTimeout(function() {
+            insertImage(url, 1);
+          }, 2000);
         }
       }
     });

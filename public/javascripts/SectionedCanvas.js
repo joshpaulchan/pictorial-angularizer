@@ -156,11 +156,9 @@ SectionedCanvas.prototype.drawImages = function(images) {
 SectionedCanvas.prototype.setClickHandler = function(fun) {
   var el = document.querySelector(this.id);
   var clicked = false;
-  el.addEventListener('mousedown', function() { clicked = true;}, false);
-  el.addEventListener('mouseup', function() { clicked = false;}, false);
-  el.addEventListener('mousemove', function(e) {
-    if (clicked) fun(e);
-  }, false);
+  el.addEventListener('mousedown', function(e) { clicked = true; fun(e)}, false);
+  el.addEventListener('mouseup', function(e) { clicked = false; fun(e)}, false);
+  el.addEventListener('mousemove', function(e) {if (clicked) fun(e);}, false);
 }
 
 SectionedCanvas.prototype.drawSpanningLine = function(id, o, d) {

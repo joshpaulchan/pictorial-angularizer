@@ -1,2 +1,78 @@
-<h1>{{title}}</h1>
-<p>Welcome to {{title}}</p>
+<script src="/javascripts/SectionedCanvas.js"></script>
+<!-- coord template -->
+<template id="file-picker">
+  <div>
+    <form>
+        <label class="upload-button like-button">
+          <input type="file" placeholder="" v-on:change="previewFile"/>
+          ⬆ 
+        </label>
+    </form>
+    <span class="filename">\{{filename}}</span>
+  </div>
+</template>
+
+<!-- coord template -->
+<template id="coord-map">
+  <li v-on:click="$emit('select')">
+    <div class="coord-input" v-bind:class="{ 'selected': active }">
+      <div class="coord">
+        <input type="number" v-model="pair.origin.x" @:click="$emit('selectCoord', 0); console.log('click')"/>,
+        <input type="number" v-model="pair.origin.y" v-on:click="$emit('selectCoord', 1)"/>
+      </div>
+      <span>⇒</span>
+      <div class="coord">
+        <input type="number" v-model="pair.dest.x" v-on:click="$emit('selectCoord', 2)"/>,
+        <input type="number" v-model="pair.dest.y" v-on:click="$emit('selectCoord', 3)"/>
+      </div>
+    </div>
+    <div class="coord-delete" v-on:click="$emit('remove')">+</div>
+  </li>
+</template>
+
+<!-- coord-map-list template -->
+<template id="coord-map-list">
+  <div>
+    <ol class="points">
+      <coord-map
+        v-for="(coordMap, index) in coordMap"
+        :pair="coordMap"
+        :active="(curCoordId === coordMap.id)"
+        v-on:select="selectCoordMap(coordMap.id)"
+        v-on:selectCoord="selCoord()"
+        v-on:remove="rmvCoordMap(coordMap.id)"
+        :key="'coordMap-' + index"></coord-map>
+    </ol>
+    <button v-on:click="addCoordMap">+</button>
+  </div>
+</template>
+
+
+<div id="app-container">
+  <div class="app">
+    <div class="header">
+        <h1 class="app-title">Pictorial Angularizer mk.3000</h1>
+    </div>
+    <div class="body">
+        <div class="sidebar">
+            <div class="section">
+                <span class="section-title">Upload</span>
+                <file-picker></file-picker>
+            </div>
+            <div class="section">
+                <span class="section-title">Points</span>
+                <coord-map-list></coord-map-list>
+            </div>
+            <div class="section">
+                <span class="section-title">Download</span>
+                <a class="like-button text-center">⬇</a>
+            </div>
+        </div>
+        <div class="panels">
+            <canvas></canvas>
+        </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript" src="/javascripts/main.js"></script>

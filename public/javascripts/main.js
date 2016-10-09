@@ -97,7 +97,7 @@
           this.reader.readAsDataURL(this.files[0]);
           
           // Display second
-          this.refreshHandler = window.setTimeout(function() {
+          this.refreshHandler = window.setInterval(function() {
             insertImage(url, 1);
           }, 2000);
         }
